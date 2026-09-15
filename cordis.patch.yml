@@ -1,0 +1,4 @@
+# 将 OpenSpec Workbench 的 Host 半插入 DSH 的 bundle 配置。
+- insert:
+    - id: dsh-openspec-workbench
+      name: dsh-openspec-workbench

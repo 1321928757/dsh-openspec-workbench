@@ -1,0 +1,91 @@
+{
+  "name": "dsh-openspec-workbench",
+  "version": "0.1.0",
+  "description": "DeepSeek Harness OpenSpec 工作台：在已注册 Workspace 中只读查看 OpenSpec 状态、工件和文档。",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": { "default": "./lib/index.js" },
+    "./client": { "default": "./lib/client.js" },
+    "./typert": { "default": "./lib/typert.host.js" },
+    "./shared": { "default": "./lib/shared.js" },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-connection",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "lib/shared.js",
+    "lib/typert.host.js",
+    "cordis.patch.yml",
+    "test",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE"
+  ],
+  "keywords": ["deepseek", "deepseek-harness", "dsh", "dsh-plugin", "openspec", "sdd", "spec-driven", "ui"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/1321928757/dsh-openspec-workbench.git"
+  },
+  "dependencies": {
+    "zod": "^4.4.3",
+    "@deepseek-ai/schemastery": "^3.18.1"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-client-runtime": ">=0.1.1-rc.2",
+    "@deepseek-ai/dsh-client-ui-conversation": ">=0.1.1-rc.2",
+    "@deepseek-ai/dsh-client-ui-settings": ">=0.1.1-rc.2",
+    "@deepseek-ai/dsh-client-ui-slots": ">=0.1.1-rc.2",
+    "@deepseek-ai/dsh-client-locale": ">=0.1.1-rc.2",
+    "@deepseek-ai/dsh-fs": ">=0.1.1-rc.2",
+    "@deepseek-ai/dsh-sandbox": ">=0.1.1-rc.2",
+    "@deepseek-ai/dsh-sandbox-policy": ">=0.1.1-rc.2",
+    "@deepseek-ai/dsh-settings": ">=0.1.1-rc.2",
+    "@deepseek-ai/dsh-subprocess": ">=0.1.1-rc.2",
+    "@deepseek-ai/dsh-shell": ">=0.1.1-rc.2",
+    "@deepseek-ai/dsh-typert-loader": ">=0.1.1-rc.2",
+    "@deepseek-ai/dsh-workspace": ">=0.1.1-rc.2",
+    "@deepseek-ai/schemastery": "^3.18.1",
+    "react": "^18.3.1"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": { "optional": true },
+    "@deepseek-ai/dsh-client-runtime": { "optional": true },
+    "@deepseek-ai/dsh-client-ui-conversation": { "optional": true },
+    "@deepseek-ai/dsh-client-ui-settings": { "optional": true },
+    "@deepseek-ai/dsh-client-ui-slots": { "optional": true },
+    "@deepseek-ai/dsh-client-locale": { "optional": true },
+    "@deepseek-ai/dsh-fs": { "optional": true },
+    "@deepseek-ai/dsh-sandbox": { "optional": true },
+    "@deepseek-ai/dsh-sandbox-policy": { "optional": true },
+    "@deepseek-ai/dsh-settings": { "optional": true },
+    "@deepseek-ai/dsh-subprocess": { "optional": true },
+    "@deepseek-ai/dsh-shell": { "optional": true },
+    "@deepseek-ai/dsh-typert-loader": { "optional": true },
+    "@deepseek-ai/dsh-workspace": { "optional": true },
+    "react": { "optional": true }
+  },
+  "scripts": {
+    "test": "node test/shared.test.mjs && node test/typert.test.mjs && node test/client.test.mjs",
+    "check": "node --check lib/index.js && node --check lib/client.js && node --check lib/shared.js && node --check lib/typert.host.js && node test/typert.test.mjs && node test/client.test.mjs",
+    "pack:check": "npm pack --dry-run"
+  },
+  "packageManager": "pnpm@11.9.0"
+}
