@@ -1,52 +1,160 @@
 # dsh-openspec-workbench
 
-OpenSpec Workbench for DeepSeek Harness：在 DSH 中查看已注册 Workspace 的 OpenSpec 状态、工件依赖、任务进度和规划文档。
+[中文说明](README.zh-CN.md) · [GitHub repository](https://github.com/1321928757/dsh-openspec-workbench)
 
-## 当前版本能力
+A read-only OpenSpec workbench for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness). Use it to inspect OpenSpec changes in registered DSH Workspaces, understand workflow and task status, and read planning documents without editing the project.
 
-- 通过 DSH 的 `conversation.view` 提供 OpenSpec 工作台，不接管 Chat session shell；
-- 默认使用当前 DSH Workspace，也可以切换其他已注册 Workspace；
-- 以列表/详情方式查看 active changes、归档 changes、工件状态和任务进度；
-- 按需阅读 proposal、design、spec、tasks 和自定义工件 Markdown；
-- 优先读取 OpenSpec CLI 结构化状态，CLI 不可用时提供明确标注的有边界文件扫描结果；
-- 展示来源、刷新状态和诊断信息；
-- 首个版本只读，不编辑文件、不执行 apply/verify/archive、不执行任意 shell 命令。
+> **Installation source:** this repository is currently distributed through GitHub, not npm. Use the `github:<owner>/<repo>` spec below. The bare package name may return a registry 404 until an npm release is published.
 
-## 兼容性
+## Features
 
-- DSH：目标为 `@deepseek-ai/dsh` `0.1.1-rc.2` 及兼容的 Web bundle 契约；
-- OpenSpec CLI：首个版本目标 `>=1.12.0 <1.13.0`；
-- 不支持的 CLI 版本不会被静默当作权威状态来源；安全的文件发现能力会标注为 fallback。
-- Windows 下会安全识别 npm/pnpm 生成的 `.cmd`/`.bat` shim，并转换为显式 Node argv；不会通过 `cmd.exe` 执行用户可控 shell 字符串。
-- CLI 解析、shim 校验、进程启动、非零退出、超时、取消和 JSON 解析失败会显示为 warning；底层 `EINVAL` 等原因会保留在诊断 details 中。
+- Provides an OpenSpec tab through DSH's `conversation.view` surface;
+- Discovers changes within registered DSH Workspaces using stable Workspace identities;
+- Lists active and archived changes with status filters, search, and sorting;
+- Shows artifact summaries, task progress, provenance, freshness, and diagnostics;
+- Loads `proposal`, `design`, `spec`, `tasks`, and custom Markdown artifacts on demand;
+- Shows `没有匹配结果` when loaded data does not match the current local filter or search;
+- Uses structured OpenSpec CLI status when supported, with clearly labelled bounded file-scan fallback;
+- Stays read-only: no file edits, OpenSpec workflow commands, arbitrary shell commands, or arbitrary directory access.
 
-## 安装
+## Requirements and compatibility
 
-```sh
-dsh plugin --profile web add dsh-openspec-workbench
+| Component | Requirement |
+| --- | --- |
+| DSH Web | A DSH `0.1.1-rc.2`-compatible Web bundle or a compatible later runtime |
+| OpenSpec CLI | `>=1.12.0 <1.13.0` for CLI-authoritative status |
+| Workspace | The project must be registered as a DSH Workspace |
+| Node.js | Use the Node.js version required by your DSH installation |
+
+OpenSpec CLI is optional for basic discovery. If the CLI is missing, unsupported, or cannot be used safely, the workbench keeps bounded file-scan results and labels the source and diagnostic instead of claiming CLI authority.
+
+## Install from GitHub
+
+Run this command from any directory:
+
+```powershell
+dsh plugin --profile web add "github:1321928757/dsh-openspec-workbench"
 ```
 
-然后启动实际的 DSH Web。开发和验收时请使用独立测试实例，不要在用户当前的 `http://127.0.0.1:3080` 实例中安装或验证插件；默认测试地址为 `http://127.0.0.1:3094`。
+This installs the GitHub repository into the DSH `web` profile. DSH then reconciles packages that declare a `dsh.bundle` patch into the profile's bundle list.
 
-## CLI 诊断与 fallback
+### Verify the installation
 
-在 CLI 可执行且版本满足 `>=1.12.0 <1.13.0` 时，Workbench 使用 CLI 的结构化输出作为适用状态、validation、instructions 和 diff 的权威来源，并标记为 CLI authority。Windows npm/pnpm 安装通常提供 `openspec.cmd` 或 `openspec.bat`；插件只接受可识别的静态 shim 模板，并解析为原生 Node executable + JavaScript entry 的显式 argv。未知 shim 模板、目标缺失、`spawn EINVAL`、非零退出、超时、取消或无效 JSON 均 fail-closed，并保留可用的 file-scan fallback。
-
-如果你看到 `CLI 不可用，显示文件扫描结果` 或 warning，表示当前项目仍可浏览发现到的 changes 和文档，但 CLI status、validation、instructions 或 diff 可能不可用。诊断会保留稳定 code 和底层 cause details；这不是 OpenSpec 文档损坏。
-
-## 安全边界
-
-Host 只接受已注册 Workspace 的稳定 identity，并把读取范围限制在该 Workspace 下的 `openspec/` 根目录。Host 使用精确 argv 调用 CLI，不启用通用 `cmd.exe` shell，也不接受用户提供的 shell 字符串；文档大小、扫描深度和扫描条目数量均有上限。插件不会修改 OpenSpec 仓库文件。
-
-## 开发
-
-```sh
-node --check lib/index.js
-node --check lib/client.js
-node --test test/shared.test.mjs
-npm pack --dry-run
+```powershell
+dsh --profile web --dump-config | findstr dsh-openspec-workbench
+dsh plugin --profile web why dsh-openspec-workbench
 ```
 
-## 许可证
+Start or restart the DSH Web process for the `web` profile, refresh the browser, open the **OpenSpec** tab, and select a registered Workspace. Installing a package changes the profile on disk; an already-running Web process does not automatically rebuild its boot graph.
+
+## Update or remove
+
+To update the GitHub dependency in the same profile, re-run the GitHub spec:
+
+```powershell
+dsh plugin --profile web add "github:1321928757/dsh-openspec-workbench"
+```
+
+You may also ask pnpm to update the named dependency:
+
+```powershell
+dsh plugin --profile web update dsh-openspec-workbench
+```
+
+Remove it with:
+
+```powershell
+dsh plugin --profile web remove dsh-openspec-workbench
+```
+
+After an update or removal, restart the affected DSH Web process and refresh the browser. Ask for confirmation before restarting a shared or user-facing DSH instance.
+
+This repository does not currently publish a versioned Git tag. The GitHub command follows the repository's default branch. Once a release tag exists, a fixed installation can use a spec such as `github:1321928757/dsh-openspec-workbench#v0.1.0`.
+
+## Quick start
+
+1. Open the **OpenSpec** tab in DSH Web.
+2. Select a registered Workspace.
+3. Use **全部**, a status filter, or the search box to narrow the change list.
+4. If the loaded collection has no match, the workbench shows **没有匹配结果** instead of a loading message.
+5. Select a change to load its artifacts, then select an artifact to read its content.
+6. Use provenance and diagnostics to distinguish CLI-authoritative data from file-scan fallback.
+
+## Data scope and security boundary
+
+- The Host accepts only registered Workspace identities and limits discovery and document reads to the selected Workspace's `openspec/` root.
+- The normal active view loads bounded change summaries. Archived data is loaded only when the archived view needs it.
+- CLI invocation uses explicit arguments and a controlled working directory. On Windows, recognised npm/pnpm `.cmd` and `.bat` shims are converted to a native Node argument plan; user-controlled shell strings are not passed to `cmd.exe`.
+- The plugin is read-only. It does not edit OpenSpec files or expose apply, verify, archive, arbitrary shell, or arbitrary command execution actions.
+- CLI status, file scanning, document reads, and diagnostics are separate evidence facets. Fallback results are labelled as fallback rather than presented as unconditional CLI authority.
+- Data displayed in the DSH UI is ordinary DSH application data. Follow your configured model/provider data policy when reviewing sensitive project content.
+
+## Known limitations
+
+- Only Workspaces already registered with DSH can be selected; this is not an arbitrary directory picker.
+- CLI-authoritative status is limited to the supported OpenSpec CLI `1.12.x` line. Other versions may still provide bounded fallback discovery with a warning.
+- The current release is read-only and does not run OpenSpec workflow commands from the UI.
+- The repository is currently installed from GitHub's default branch rather than an npm package or versioned tag.
+- A running DSH Web process must be restarted after profile installation or update before its Host and Client bundles can change.
+
+## Troubleshooting
+
+### The OpenSpec tab is missing
+
+Check that the dependency is in the intended profile and that the composed config contains it:
+
+```powershell
+dsh --profile web --dump-config | findstr dsh-openspec-workbench
+```
+
+If the package is present but the tab is stale, restart the DSH Web process and refresh the page.
+
+### Installation reports that the package cannot be found
+
+Make sure you use the GitHub spec, not the bare package name:
+
+```powershell
+dsh plugin --profile web add "github:1321928757/dsh-openspec-workbench"
+```
+
+If pnpm reports a build approval requirement for a Git-hosted dependency, follow the exact package key and profile file path printed by DSH/pnpm, then re-run the command.
+
+### The list is empty
+
+Select a registered Workspace and confirm that the selected project contains a readable `openspec/` directory. An empty result for one Workspace does not prove that other Workspaces contain no changes.
+
+### The source says file-scan fallback
+
+The OpenSpec CLI is unavailable, unsupported, or its structured result could not be used safely. Read the displayed diagnostic, check the CLI version and installation, and retry after correcting the environment. The fallback is intentionally bounded and labelled.
+
+### Filtering shows no result
+
+`没有匹配结果` means the change resource loaded successfully but the current local status/search combination matched nothing. Adjust the status button or search term; this state does not create another Host request.
+
+## How it works
+
+```text
+Registered DSH Workspace
+          │
+          ▼
+Host service ── bounded CLI/file discovery ──► change and document metadata
+          │
+          ▼
+Client conversation.view ── local filter/search ──► OpenSpec reader
+```
+
+The package contains a Host bundle patch, a Web client module, a Typert Host descriptor, and shared normalization helpers. The browser client mounts six read-only Host methods and derives status/search results locally from the loaded collection.
+
+## Development and validation
+
+```powershell
+npm test
+npm run check
+npm run pack:check
+```
+
+Generated `lib/` artifacts are kept in the repository so the GitHub installation path can use committed package contents. Use a separate DSH profile for local testing when possible; avoid changing a shared `web` profile while another DSH Web process is serving users.
+
+## License
 
 MIT
