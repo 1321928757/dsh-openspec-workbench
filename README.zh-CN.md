@@ -100,7 +100,7 @@ dsh plugin --profile web add "github:1321928757/dsh-openspec-workbench#v0.1.0"
 - 只能选择已经注册到 DSH 的 Workspace，不能把任意目录直接交给工作台。
 - CLI 权威状态仅支持 OpenSpec CLI `1.12.x` 版本线。其他版本可能仍提供带 warning 的有边界 fallback 发现结果。
 - 当前版本为只读版本，不在 UI 中执行 OpenSpec 工作流命令。
-- 当前仓库通过 GitHub 默认分支发布源码，尚未发布 npm 版本或带版本号的 Git tag。
+- 当前仓库通过 GitHub 分发，尚未发布 npm 版本；需要固定版本时请使用 `#v0.1.0` tag。
 - profile 安装或更新后，必须重启正在运行的 DSH Web 进程，新的 Client 和 Host bundle 才会生效。
 
 ## 故障排查

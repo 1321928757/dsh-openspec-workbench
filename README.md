@@ -100,7 +100,7 @@ The untagged GitHub command follows the repository's default branch and may rece
 - Only Workspaces already registered with DSH can be selected; this is not an arbitrary directory picker.
 - CLI-authoritative status is limited to the supported OpenSpec CLI `1.12.x` line. Other versions may still provide bounded fallback discovery with a warning.
 - The current release is read-only and does not run OpenSpec workflow commands from the UI.
-- The repository is currently installed from GitHub's default branch rather than an npm package or versioned tag.
+- The repository is currently installed from GitHub rather than an npm package; use `#v0.1.0` when a fixed tag is preferred.
 - A running DSH Web process must be restarted after profile installation or update before its Host and Client bundles can change.
 
 ## Troubleshooting
