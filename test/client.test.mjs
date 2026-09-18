@@ -147,6 +147,34 @@ test('client Markdown renderer treats content as text and caps input', () => {
   assert.match(markdown, /React\.createElement\('pre'/)
 })
 
+test('client Markdown renderer preserves task-list state and indentation', () => {
+  const markdown = between('function MarkdownView', 'class ErrorBoundary')
+  assert.match(markdown, /const item = line\.match\(\/\^\(\\s\*\)\[-\*\]\\s\+\(\?:\\\[\(\[ xX\]\)\\\]\\s\*\)\?\(\.\*\)\$\//)
+  assert.match(markdown, /task: marker !== undefined/)
+  assert.match(markdown, /checked: marker\?\.toLowerCase\(\) === 'x'/)
+  assert.match(markdown, /Math\.floor\(item\[1\]\.length \/ 2\)/)
+  assert.match(markdown, /if \(!item\.task\).*item\.text/)
+  assert.match(markdown, /if \(code !== null\) \{ code\.push\(line\); return \}/)
+  assert.match(markdown, /type: 'checkbox'/)
+  assert.match(markdown, /checked: item\.checked/)
+  assert.match(markdown, /disabled: true/)
+  assert.match(markdown, /readOnly: true/)
+  assert.match(markdown, /tabIndex: -1/)
+  assert.match(markdown, /aria-label.*stateLabel/)
+  assert.match(source, /\.oswb-task-checkbox\{width:14px;height:14px/)
+})
+
+test('client task preview remains read-only and does not add mutation RPCs', () => {
+  const markdown = between('function MarkdownView', 'class ErrorBoundary')
+  assert.doesNotMatch(markdown, /onChange:/)
+  assert.doesNotMatch(markdown, /onClick:/)
+  const methodMatch = source.match(/const RPC_METHODS = \[(.*?)\]/s)
+  assert.deepEqual(methodMatch?.[1]?.replaceAll("'", '').split(', ').filter(Boolean), [
+    'listProjects', 'listChanges', 'getChangeStatus', 'listDocuments', 'readDocument', 'getEvidence',
+  ])
+  assert.doesNotMatch(markdown, /writeDocument|updateTask|toggleTask|applyTask/)
+})
+
 test('client accessibility and responsive CSS contracts are namespaced', () => {
   assert.match(source, /\.oswb-root\{/)
   assert.match(source, /:focus-visible/)

@@ -69,11 +69,13 @@ dsh plugin --profile web remove dsh-openspec-workbench
 
 更新或卸载后，需要重启受影响的 DSH Web 进程并刷新浏览器。对于共享或用户正在使用的 DSH 实例，请先确认再重启。
 
-当前仓库还没有版本化 Git tag。上面的命令跟随 GitHub 默认分支；未来创建 release tag 后，可以使用类似下面的固定版本地址：
+`v0.1.0` release tag 现在指向此版本。为了获得可复现的安装结果，可以使用固定 tag：
 
 ```powershell
 dsh plugin --profile web add "github:1321928757/dsh-openspec-workbench#v0.1.0"
 ```
+
+不带 tag 的 GitHub 命令会跟随默认分支，后续可能安装到更新内容。
 
 ## 快速开始
 

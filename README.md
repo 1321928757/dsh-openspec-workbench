@@ -69,7 +69,13 @@ dsh plugin --profile web remove dsh-openspec-workbench
 
 After an update or removal, restart the affected DSH Web process and refresh the browser. Ask for confirmation before restarting a shared or user-facing DSH instance.
 
-This repository does not currently publish a versioned Git tag. The GitHub command follows the repository's default branch. Once a release tag exists, a fixed installation can use a spec such as `github:1321928757/dsh-openspec-workbench#v0.1.0`.
+The `v0.1.0` release tag points to this package version. For reproducible installation, use the fixed tag:
+
+```powershell
+dsh plugin --profile web add "github:1321928757/dsh-openspec-workbench#v0.1.0"
+```
+
+The untagged GitHub command follows the repository's default branch and may receive later changes.
 
 ## Quick start
 
