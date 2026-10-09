@@ -18,7 +18,7 @@ The project baseline test command currently passes 54 assertions/subtests, but e
 - No additions to RPC methods or changes to OpenSpec data semantics, Workspace scoping, CLI support, or mutation permissions.
 - No redesign of the conversation view, general Settings UI, or preference data model.
 - No changes to or restart of the user's active DSH profile as part of validation.
-- Do not claim compatibility with DSH 0.2.0 final until its runtime contract and isolated execution have been verified.
+- Do not imply an independently captured final-runtime trace; the basic DSH 0.2.0 smoke test is user-reported, while the isolated run used RC.2.
 
 ## Decisions
 
@@ -40,7 +40,7 @@ Update Host tests to check `create()` and call its returned `.parse()` with vali
 
 ### 4. Pin compatibility to the verifiable runtime artifact
 
-The checked official app.asar and embedded runtime package graph both report DSH `0.2.0-rc.2`, with Cordis `4.0.4`; the package engine and relevant DSH peers are pinned to that exact RC. Do not claim final `0.2.0` compatibility or widen the engine range while the final artifact has not been inspected. Preserve `dsh.client.platform: web`, the current bundle patch and package-name module loader id. Do not add `zod` to browser `external` or add settings slot packages to required injection merely to force module availability. A separate scratch `DSH_HOME`, temporary profile, dedicated non-legacy port and disposable browser data directory can verify only the RC; do not mutate or claim access to the user's current instance.
+The original `v0.2.0` package used `>=0.2.0 <0.3.0`, which excludes the DSH `0.2.0-rc.2` prerelease under SemVer despite the compatible API package line. The compatibility follow-up widens engines and DSH peers to `>=0.2.0-rc.2 <0.3.0`, covering the verified RC.2 and the user's manually smoke-tested final `0.2.0`. Preserve `dsh.client.platform: web`, the current bundle patch and package-name module loader id. Do not add `zod` to browser `external` or add settings slot packages to required injection merely to force module availability. A separate scratch `DSH_HOME`, temporary profile, dedicated non-legacy port and disposable browser data directory can verify only the RC; do not mutate or claim access to the user's current instance.
 
 **Alternative considered:** Trust peer metadata and unit tests alone. Rejected because plugin activation failures can cause App self-protection to remove the bundle entry, while static tests do not exercise boot graph assembly, Host activation, slot projection or RPC transport.
 

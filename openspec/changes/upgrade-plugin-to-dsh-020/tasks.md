@@ -1,7 +1,7 @@
 ## 1. Runtime Contract and Compatibility Metadata
 
 - [x] 1.1 Inspect the available official Host/Browser codec rules and plugin Settings tab registration from DSH `0.2.0-rc.2` / Cordis `4.0.4`; the user separately reports a successful basic manual smoke test on final DSH `0.2.0`.
-- [x] 1.2 Set `engines.dsh` and DSH API peers to `>=0.2.0 <0.3.0`, align Cordis to `~4.0.4`, and verify `dsh.client.platform`, exports, bundle patch and client injection. Final-release evidence is user-reported manual smoke testing, not an independently captured runtime trace.
+- [x] 1.2 Set `engines.dsh` and DSH API peers to `>=0.2.0-rc.2 <0.3.0` so the known RC.2 prerelease and final 0.2.x builds satisfy SemVer, align Cordis to `~4.0.4`, and verify `dsh.client.platform`, exports, bundle patch and client injection. Final-release evidence is user-reported manual smoke testing, not an independently captured runtime trace.
 
 ## 2. Host and Client Contract Migration
 
@@ -12,8 +12,8 @@
 ## 3. Regression Tests and Package Checks
 
 - [x] 3.1 Replace Host and Client tests that encode schema-only descriptors with positive DSH 0.2 contract assertions and negative/mutation tests for missing `create()`; verify the failures match the relevant runtime contract errors.
-- [x] 3.2 Run `npm test`, `npm run check`, and `npm run pack:check`; verify syntax, all tests, package export targets and packed files pass for the declared DSH `>=0.2.0 <0.3.0` range.
-- [x] 3.3 Update README compatibility/install guidance and existing release metadata: bump package version/tag reference to `0.2.0`, reflect the user's manual final-runtime smoke test, and state isolated validation requirements. No installer revision exists in this repository; tag publication remains task 4.4.
+- [x] 3.2 Run `npm test`, `npm run check`, and `npm run pack:check`; verify syntax, all tests, package export targets and packed files pass for the declared DSH `>=0.2.0-rc.2 <0.3.0` range.
+- [x] 3.3 Update README compatibility/install guidance and existing release metadata: version/tag `0.2.0` records the initial migration; this follow-up bumps package version/tag to `0.2.1` to admit DSH RC.2, reflects the user's manual final-runtime smoke test, and states isolated validation requirements. No installer revision exists in this repository; tag publication remains conditional.
 
 ## 4. Isolated Runtime Acceptance and Release Readiness
 

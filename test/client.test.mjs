@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import fs from 'node:fs'
+import packageJson from '../package.json' with { type: 'json' }
 
 const source = fs.readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8')
 
@@ -231,6 +232,32 @@ test('client accessibility and responsive CSS contracts are namespaced', () => {
   assert.match(source, /'aria-label': '搜索 changes'/)
   assert.match(source, /'aria-pressed': selected/)
   assert.match(source, /role: 'tablist'/)
+})
+
+test('package metadata accepts DSH RC.2 and final 0.2.x but excludes 0.1.x and 0.3.x', () => {
+  const expectedRange = '>=0.2.0-rc.2 <0.3.0'
+  assert.equal(packageJson.version, '0.2.1')
+  assert.equal(packageJson.engines.dsh, expectedRange)
+  for (const [name, range] of Object.entries(packageJson.peerDependencies)) {
+    if (name.startsWith('@deepseek-ai/dsh-')) assert.equal(range, expectedRange, `${name} must match engines.dsh`)
+  }
+
+  const satisfies = (version, range) => {
+    const [lower, upper] = range.split(' <')
+    const compare = (left, right) => {
+      const parse = (value) => {
+        const match = value.match(/^(\d+)\.(\d+)\.(\d+)(?:-rc\.(\d+))?$/)
+        assert.ok(match, `invalid test version: ${value}`)
+        return match.slice(1).map((part, index) => index === 3 ? (part === undefined ? Number.POSITIVE_INFINITY : Number(part)) : Number(part || 0))
+      }
+      const a = parse(left), b = parse(right)
+      for (let index = 0; index < a.length; index += 1) if (a[index] !== b[index]) return a[index] < b[index] ? -1 : 1
+      return 0
+    }
+    return compare(version, lower.replace(/^>=/, '')) >= 0 && compare(version, upper) < 0
+  }
+  for (const version of ['0.2.0-rc.2', '0.2.0', '0.2.1', '0.2.99']) assert.equal(satisfies(version, expectedRange), true, version)
+  for (const version of ['0.1.9', '0.2.0-rc.1', '0.3.0']) assert.equal(satisfies(version, expectedRange), false, version)
 })
 
 test('client has an ErrorBoundary class and remote mount is optional', () => {

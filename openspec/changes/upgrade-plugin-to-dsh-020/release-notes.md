@@ -1,10 +1,16 @@
 # Release notes
 
+## 0.2.1
+
+### Fixed
+
+- Corrected the DSH engine and API peer ranges to `>=0.2.0-rc.2 <0.3.0`; this accepts DSH `0.2.0-rc.2` as well as final 0.2.x versions. The previous `>=0.2.0 <0.3.0` range unintentionally rejected all prereleases under SemVer.
+
 ## 0.2.0
 
 ### Breaking compatibility change
 
-- Requires DSH `>=0.2.0 <0.3.0` and Cordis `~4.0.4`.
+- Requires DSH `>=0.2.0 <0.3.0` and Cordis `~4.0.4` (initial v0.2.0 metadata; v0.2.1 fixes RC.2 prerelease inclusion).
 - Host and Client Typert strict descriptors now use `create()` codec factories. Older DSH 0.1.x runtimes are not supported.
 
 ### Changed

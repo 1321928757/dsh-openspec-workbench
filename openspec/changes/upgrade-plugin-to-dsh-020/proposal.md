@@ -7,7 +7,7 @@
 - **BREAKING**：将 Host invocation 参数和结果 codec 更新为 DSH 0.2 strict codec 契约，提供返回可 `.parse()` schema 的 `create()`。
 - 更新浏览器端 remote descriptors，提供不依赖未保证浏览器模块的 `create()`；移除客户端通过模块表加载 `zod` 的兼容性假设。
 - 将 OpenSpec 偏好卡片迁移到 DSH 0.2 插件设置页 Slot `settings.plugins.tab`，保留现有偏好读写语义；核验 Slot 选项及注入生命周期。
-- 更新 DSH/Cordis peer、`engines.dsh` 与兼容性文档，以 DSH `>=0.2.0 <0.3.0` 为目标范围；用户报告已在正式 DSH `0.2.0` 上完成基本手动冒烟测试。
+- 更新 DSH/Cordis peer、`engines.dsh` 与兼容性文档，以 DSH `>=0.2.0-rc.2 <0.3.0` 为目标范围；用户报告已在正式 DSH `0.2.0` 上完成基本手动冒烟测试。
 - 增加契约回归测试，明确验证 Host 与 Client 两侧 `create()`，并验证 schema-only 旧形态在兼容性校验中被拒绝。
 - 采用隔离 DSH profile、独立端口及浏览器数据目录进行 Host/Web 验收；测试阶段不得重启或改动用户正在使用的实例。
 

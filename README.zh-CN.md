@@ -17,9 +17,13 @@
 - OpenSpec CLI 可用时使用结构化 status；不可用时提供明确标记的有边界文件扫描 fallback；
 - 保持只读边界：不编辑文件、不执行 apply、verify、archive 或任意 shell 命令。
 
+## 0.2.1 更新说明
+
+- 修正兼容性元数据：现在同时接受 DSH `0.2.0-rc.2` 与正式 `0.2.x`；旧版 `v0.2.0` 的范围意外排除了全部预发布版本。
+
 ## 0.2.0 更新说明
 
-- **破坏性变更：** 不再支持 DSH 0.1.x；本版本要求 DSH `>=0.2.0 <0.3.0`、Cordis `~4.0.4`。
+- **破坏性变更：** 不再支持 DSH 0.1.x；本版本要求 DSH `>=0.2.0-rc.2 <0.3.0`、Cordis `~4.0.4`。
 - Host 与 Client Typert strict codec 改用运行时调用的 `create()` 工厂；浏览器 codec 不再要求 Client 模块表提供 `zod`。
 - 偏好卡片迁移到 DSH 插件设置页（`settings.plugins.tab`）；保留原有六个只读 RPC 方法和 Workspace 范围行为。
 - 用户报告已在正式 DSH `0.2.0` 上完成基本手动冒烟测试；自动化契约、语法和打包检查也通过。隔离 scratch Web 冒烟测试使用的是 DSH `0.2.0-rc.2`。
@@ -28,7 +32,7 @@
 
 | 组件 | 支持基线 |
 | --- | --- |
-| DSH Web | DSH Web `>=0.2.0 <0.3.0`（已在正式版 `0.2.0` 运行时完成手动冒烟测试） |
+| DSH Web | DSH Web `>=0.2.0-rc.2 <0.3.0`（接受 RC.2 与正式版 `0.2.0`；已在正式版手动冒烟测试） |
 | OpenSpec CLI | `>=1.12.0 <1.13.0` 时提供 CLI 权威状态 |
 | Workspace | 项目必须已经注册为 DSH Workspace |
 | Node.js | 使用 DSH 安装所要求的 Node.js 版本 |
@@ -76,10 +80,10 @@ dsh plugin --profile web remove dsh-openspec-workbench
 
 更新或卸载后，需要重启受影响的 DSH Web 进程并刷新浏览器。对于共享或用户正在使用的 DSH 实例，请先确认再重启。
 
-`v0.2.0` release tag 对应此包版本。为获得可复现的安装结果，请使用固定 tag；`v0.1.0` 是旧包的 tag：
+`v0.2.1` release tag 对应此包版本，并包含 RC.2 兼容性修复。为获得可复现的安装结果，请使用固定 tag；`v0.2.0` 是初始 DSH 0.2 版本，`v0.1.0` 更旧：
 
 ```powershell
-dsh plugin --profile web add "github:1321928757/dsh-openspec-workbench#v0.2.0"
+dsh plugin --profile web add "github:1321928757/dsh-openspec-workbench#v0.2.1"
 ```
 
 不带 tag 的 GitHub 命令会跟随默认分支，后续可能安装到更新内容。

@@ -17,9 +17,13 @@ A read-only OpenSpec workbench for [DeepSeek Harness](https://github.com/deepsee
 - Uses structured OpenSpec CLI status when supported, with clearly labelled bounded file-scan fallback;
 - Stays read-only: no file edits, OpenSpec workflow commands, arbitrary shell commands, or arbitrary directory access.
 
+## What's new in 0.2.1
+
+- Fix compatibility metadata so DSH `0.2.0-rc.2` is accepted as well as final DSH `0.2.x`. Previous `v0.2.0` metadata excluded all pre-release versions.
+
 ## What's new in 0.2.0
 
-- **Breaking:** DSH 0.1.x is no longer supported. This release requires DSH `>=0.2.0 <0.3.0` and Cordis `~4.0.4`.
+- **Breaking:** DSH 0.1.x is no longer supported. This release requires DSH `>=0.2.0-rc.2 <0.3.0` and Cordis `~4.0.4`.
 - Host and Client Typert strict codecs now use runtime-created `create()` schemas; the browser codec no longer requires `zod` from the Client module table.
 - The preferences card now lives in the DSH Plugins settings tab (`settings.plugins.tab`). The six existing read-only RPC methods and Workspace-scoped behavior are retained.
 - The user reports a successful basic manual smoke test on final DSH `0.2.0`. Automated contract, syntax, and package checks also pass; the isolated scratch Web smoke run used DSH `0.2.0-rc.2`.
@@ -28,7 +32,7 @@ A read-only OpenSpec workbench for [DeepSeek Harness](https://github.com/deepsee
 
 | Component | Requirement |
 | --- | --- |
-| DSH Web | DSH Web `>=0.2.0 <0.3.0` (manually smoke-tested on the final `0.2.0` runtime) |
+| DSH Web | DSH Web `>=0.2.0-rc.2 <0.3.0` (RC.2 and final `0.2.0` accepted; final `0.2.0` manually smoke-tested) |
 | OpenSpec CLI | `>=1.12.0 <1.13.0` for CLI-authoritative status |
 | Workspace | The project must be registered as a DSH Workspace |
 | Node.js | Use the Node.js version required by your DSH installation |
@@ -76,10 +80,10 @@ dsh plugin --profile web remove dsh-openspec-workbench
 
 After an update or removal, restart the affected DSH Web process and refresh the browser. Ask for confirmation before restarting a shared or user-facing DSH instance.
 
-The `v0.2.0` release tag points to this package version. For reproducible installation, use the fixed tag; `v0.1.0` refers to the previous package:
+The `v0.2.1` release tag points to this package version and contains the RC.2 compatibility fix. Use the fixed tag for reproducible installation; `v0.2.0` is the initial DSH 0.2 release and `v0.1.0` is older:
 
 ```powershell
-dsh plugin --profile web add "github:1321928757/dsh-openspec-workbench#v0.2.0"
+dsh plugin --profile web add "github:1321928757/dsh-openspec-workbench#v0.2.1"
 ```
 
 The untagged GitHub command follows the repository's default branch and may receive later changes.
