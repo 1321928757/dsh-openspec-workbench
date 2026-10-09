@@ -12,6 +12,53 @@ function between(start, end) {
   return source.slice(from, to)
 }
 
+async function loadContribution({ withSettings = true } = {}) {
+  let plugin
+  let contribution
+  const registrations = []
+  const scope = { getSnapshot: () => ({ value: {}, writable: false }) }
+  const slots = {
+    inject: (_key, register) => register(),
+    register: (descriptor, render) => { registrations.push({ descriptor, render }); return () => {} },
+  }
+  const remote = { $mount: async (value) => { contribution = value; return () => {} } }
+  const react = { Component: class {}, createElement: (type, props, ...children) => ({ type, props, children }) }
+  const sandbox = {
+    window: { __ModuleLoader__: { load: (entry) => { plugin = entry.factory((id) => {
+      if (id === 'react') return react
+      throw new Error(`client-modules: require("${id}") missed the module table`)
+    }) } } },
+    document: undefined,
+    console,
+    Map,
+    Set,
+    Date,
+    Math,
+    Number,
+    String,
+    Object,
+    Array,
+    Error,
+    Promise,
+    AbortController,
+    TextEncoder,
+    URL,
+    setTimeout,
+    clearTimeout,
+  }
+  // Evaluate the actual dynamic browser module with only React available, then
+  // mount against controlled Cordis facades to capture its real descriptors.
+  Function(...Object.keys(sandbox), source)(...Object.values(sandbox))
+  const locale = { register: () => () => {} }
+  const context = {
+    get: (key) => key === 'slots' ? slots : key === 'remote' ? remote : key === 'locale' ? locale : undefined,
+    ...(withSettings ? { inject: (_keys, callback) => callback({ settingsScope: { bind: () => scope } }) } : {}),
+    effect: () => {},
+  }
+  await plugin.apply(context)
+  return { plugin, contribution, registrations }
+}
+
 test('client bundle registers a session-scoped OpenSpec conversation view', () => {
   assert.match(source, /window\.__ModuleLoader__\.load\(/)
   assert.match(source, /id: 'dsh-openspec-workbench'/)
@@ -194,18 +241,68 @@ test('client has an ErrorBoundary class and remote mount is optional', () => {
   assert.match(source, /Typert remote mount unavailable/)
 })
 
-test('client remote descriptors are JSON-safe and match the six Host methods', () => {
+test('client remote descriptors are dependency-free and match the six Host methods', async () => {
   const methodMatch = source.match(/const RPC_METHODS = \[(.*?)\]/s)
   const methods = methodMatch?.[1] || ''
   assert.deepEqual(methods.replaceAll("'", '').split(', ').filter(Boolean), [
     'listProjects', 'listChanges', 'getChangeStatus', 'listDocuments', 'readDocument', 'getEvidence',
   ])
   assert.match(source, /source: 'json'/)
-  assert.match(source, /schema: zod\.z\.record/)
+  assert.match(source, /create: \(\) => \(\{/)
+  assert.doesNotMatch(source, /require\(['"]zod['"]\)/)
   assert.match(source, /for \(let depth = 0; depth < 3; depth \+= 1\)/)
   assert.match(source, /Object\.prototype\.hasOwnProperty\.call\(current, 'ok'\)/)
   assert.match(source, /Object\.prototype\.hasOwnProperty\.call\(current, 'value'\)/)
   assert.match(source, /return current\[method\]\(args \|\| \{\}\)/)
   assert.match(source, /ctx\.get\('remote\.' \+ NS\)/)
   assert.doesNotMatch(source, /ctx\.get\('remote\.' \+ SERVICE\)/)
+
+  const { contribution } = await loadContribution()
+  assert.equal(contribution.package, 'dsh-openspec-workbench')
+  assert.equal(contribution.descriptors.length, 6)
+  for (const descriptor of contribution.descriptors) {
+    assert.equal(descriptor.parameters.length, 1)
+    assert.equal(descriptor.parameters[0].wire, 'args')
+    for (const codec of [descriptor.parameters[0].codec, descriptor.result]) {
+      assert.equal(typeof codec.create, 'function')
+      assert.equal('schema' in codec, false)
+      assert.deepEqual(codec.create().parse({ ok: true }), { ok: true })
+      assert.throws(() => codec.create().parse([]), /invalid RPC value/)
+    }
+  }
+  assert.match(source, /window\.__ModuleLoader__\.load\(\{\s*id: 'dsh-openspec-workbench'/)
+})
+
+test('client strict codec factories validate object DTOs and reject the schema-only legacy shape', async () => {
+  const { contribution } = await loadContribution()
+  assert.ok(contribution)
+  const descriptor = contribution.descriptors[0]
+  const codec = descriptor.result
+  assert.deepEqual(codec.create().parse({ workspaceId: 'w1' }), { workspaceId: 'w1' })
+  assert.throws(() => codec.create().parse(null), /invalid RPC value/)
+
+  const legacy = { mode: 'strict', typeSymbol: 'dsh-openspec-workbench#Args', schema: { parse: (value) => value } }
+  const validateCodec = (value, subject) => {
+    if (value.mode !== 'strict') return
+    if (typeof value.typeSymbol !== 'string' || !value.typeSymbol) throw new Error(`typert: ${subject} type symbol is invalid`)
+    if (typeof value.create !== 'function') throw new Error(`typert: ${subject} strict codec has no create() factory`)
+  }
+  assert.throws(() => validateCodec(legacy, 'dsh-openspec-workbench#openspec-workbench/listProjects result'), /typert: dsh-openspec-workbench#openspec-workbench\/listProjects result strict codec has no create\(\) factory/)
+})
+
+test('client contributes settings through the DSH 0.2 Plugins tab with a stable id', async () => {
+  const { registrations } = await loadContribution()
+  const tab = registrations.find(({ descriptor }) => descriptor.name === 'settings.plugins.tab')
+  assert.ok(tab)
+  assert.equal(tab.descriptor.id, 'openspec-workbench')
+  assert.equal(tab.descriptor.order, 80)
+  assert.equal(tab.descriptor.label(), 'OpenSpec')
+  assert.match(source, /ctx\.inject\?\.\(\['settingsScope'\]/)
+  assert.doesNotMatch(source, /settings\.plugin\.item/)
+})
+
+test('client settings slot is optional and cannot block the main view', async () => {
+  const { registrations } = await loadContribution({ withSettings: false })
+  assert.ok(registrations.some(({ descriptor }) => descriptor.name === 'conversation.view'))
+  assert.equal(registrations.some(({ descriptor }) => descriptor.name === 'settings.plugins.tab'), false)
 })

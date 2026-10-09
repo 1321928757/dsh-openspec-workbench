@@ -17,11 +17,18 @@ A read-only OpenSpec workbench for [DeepSeek Harness](https://github.com/deepsee
 - Uses structured OpenSpec CLI status when supported, with clearly labelled bounded file-scan fallback;
 - Stays read-only: no file edits, OpenSpec workflow commands, arbitrary shell commands, or arbitrary directory access.
 
+## What's new in 0.2.0
+
+- **Breaking:** DSH 0.1.x is no longer supported. This release requires DSH `>=0.2.0 <0.3.0` and Cordis `~4.0.4`.
+- Host and Client Typert strict codecs now use runtime-created `create()` schemas; the browser codec no longer requires `zod` from the Client module table.
+- The preferences card now lives in the DSH Plugins settings tab (`settings.plugins.tab`). The six existing read-only RPC methods and Workspace-scoped behavior are retained.
+- The user reports a successful basic manual smoke test on final DSH `0.2.0`. Automated contract, syntax, and package checks also pass; the isolated scratch Web smoke run used DSH `0.2.0-rc.2`.
+
 ## Requirements and compatibility
 
 | Component | Requirement |
 | --- | --- |
-| DSH Web | A DSH `0.1.1-rc.2`-compatible Web bundle or a compatible later runtime |
+| DSH Web | DSH Web `>=0.2.0 <0.3.0` (manually smoke-tested on the final `0.2.0` runtime) |
 | OpenSpec CLI | `>=1.12.0 <1.13.0` for CLI-authoritative status |
 | Workspace | The project must be registered as a DSH Workspace |
 | Node.js | Use the Node.js version required by your DSH installation |
@@ -45,7 +52,7 @@ dsh --profile web --dump-config | findstr dsh-openspec-workbench
 dsh plugin --profile web why dsh-openspec-workbench
 ```
 
-Start or restart the DSH Web process for the `web` profile, refresh the browser, open the **OpenSpec** tab, and select a registered Workspace. Installing a package changes the profile on disk; an already-running Web process does not automatically rebuild its boot graph.
+Start or restart the DSH Web process for the target `web` profile, refresh the browser, open the **OpenSpec** tab, and select a registered Workspace. Installing a package changes the profile on disk; an already-running Web process does not automatically rebuild its boot graph. For upgrade validation, use a separate `DSH_HOME`, temporary profile, dedicated port, and disposable browser data directory. Never install into, restart, or validate against the currently used instance.
 
 ## Update or remove
 
@@ -69,10 +76,10 @@ dsh plugin --profile web remove dsh-openspec-workbench
 
 After an update or removal, restart the affected DSH Web process and refresh the browser. Ask for confirmation before restarting a shared or user-facing DSH instance.
 
-The `v0.1.0` release tag points to this package version. For reproducible installation, use the fixed tag:
+The `v0.2.0` release tag points to this package version. For reproducible installation, use the fixed tag; `v0.1.0` refers to the previous package:
 
 ```powershell
-dsh plugin --profile web add "github:1321928757/dsh-openspec-workbench#v0.1.0"
+dsh plugin --profile web add "github:1321928757/dsh-openspec-workbench#v0.2.0"
 ```
 
 The untagged GitHub command follows the repository's default branch and may receive later changes.
@@ -100,7 +107,7 @@ The untagged GitHub command follows the repository's default branch and may rece
 - Only Workspaces already registered with DSH can be selected; this is not an arbitrary directory picker.
 - CLI-authoritative status is limited to the supported OpenSpec CLI `1.12.x` line. Other versions may still provide bounded fallback discovery with a warning.
 - The current release is read-only and does not run OpenSpec workflow commands from the UI.
-- The repository is currently installed from GitHub rather than an npm package; use `#v0.1.0` when a fixed tag is preferred.
+- The repository is currently installed from GitHub rather than an npm package. A basic manual smoke test passed on final DSH `0.2.0`. The isolated runtime smoke run recorded in this repository used RC.2; a detailed six-RPC/no-project-mutation trace is not included.
 - A running DSH Web process must be restarted after profile installation or update before its Host and Client bundles can change.
 
 ## Troubleshooting

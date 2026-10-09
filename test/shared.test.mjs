@@ -770,8 +770,13 @@ test('Typert manifest uses strict zod v4 codecs', async () => {
   assert.ok(manifest.invocations.length >= 6)
   for (const item of manifest.invocations) {
     assert.equal(item.result.mode, 'strict')
-    assert.ok(item.result.schema?._zod)
-    assert.equal(typeof item.result.schema.parse, 'function')
+    assert.equal(typeof item.result.create, 'function')
+    assert.ok(item.result.create()?._zod)
+    assert.equal(typeof item.result.create().parse, 'function')
+    for (const parameter of item.parameters) {
+      assert.equal(typeof parameter.codec.create, 'function')
+      assert.ok(parameter.codec.create()?._zod)
+    }
   }
 })
 

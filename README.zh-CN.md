@@ -17,11 +17,18 @@
 - OpenSpec CLI 可用时使用结构化 status；不可用时提供明确标记的有边界文件扫描 fallback；
 - 保持只读边界：不编辑文件、不执行 apply、verify、archive 或任意 shell 命令。
 
+## 0.2.0 更新说明
+
+- **破坏性变更：** 不再支持 DSH 0.1.x；本版本要求 DSH `>=0.2.0 <0.3.0`、Cordis `~4.0.4`。
+- Host 与 Client Typert strict codec 改用运行时调用的 `create()` 工厂；浏览器 codec 不再要求 Client 模块表提供 `zod`。
+- 偏好卡片迁移到 DSH 插件设置页（`settings.plugins.tab`）；保留原有六个只读 RPC 方法和 Workspace 范围行为。
+- 用户报告已在正式 DSH `0.2.0` 上完成基本手动冒烟测试；自动化契约、语法和打包检查也通过。隔离 scratch Web 冒烟测试使用的是 DSH `0.2.0-rc.2`。
+
 ## 环境要求与兼容性
 
 | 组件 | 支持基线 |
 | --- | --- |
-| DSH Web | 兼容 DSH `0.1.1-rc.2` 的 Web bundle，或兼容的后续运行时 |
+| DSH Web | DSH Web `>=0.2.0 <0.3.0`（已在正式版 `0.2.0` 运行时完成手动冒烟测试） |
 | OpenSpec CLI | `>=1.12.0 <1.13.0` 时提供 CLI 权威状态 |
 | Workspace | 项目必须已经注册为 DSH Workspace |
 | Node.js | 使用 DSH 安装所要求的 Node.js 版本 |
@@ -45,7 +52,7 @@ dsh --profile web --dump-config | findstr dsh-openspec-workbench
 dsh plugin --profile web why dsh-openspec-workbench
 ```
 
-然后启动或重启 `web` profile 对应的 DSH Web 进程并刷新浏览器，进入 **OpenSpec** 标签页，选择一个已注册 Workspace。安装命令只修改 profile 磁盘文件；已经运行的 Web 进程不会自动重建 boot graph。
+然后启动或重启目标 `web` profile 对应的 DSH Web 进程并刷新浏览器，进入 **OpenSpec** 标签页，选择一个已注册 Workspace。安装命令只修改 profile 磁盘文件；已经运行的 Web 进程不会自动重建 boot graph。验证升级时请使用独立 `DSH_HOME`、临时 profile、专用端口和独立浏览器数据目录，绝不要对当前正在使用的实例进行安装、重启或验收。
 
 ## 更新与卸载
 
@@ -69,10 +76,10 @@ dsh plugin --profile web remove dsh-openspec-workbench
 
 更新或卸载后，需要重启受影响的 DSH Web 进程并刷新浏览器。对于共享或用户正在使用的 DSH 实例，请先确认再重启。
 
-`v0.1.0` release tag 现在指向此版本。为了获得可复现的安装结果，可以使用固定 tag：
+`v0.2.0` release tag 对应此包版本。为获得可复现的安装结果，请使用固定 tag；`v0.1.0` 是旧包的 tag：
 
 ```powershell
-dsh plugin --profile web add "github:1321928757/dsh-openspec-workbench#v0.1.0"
+dsh plugin --profile web add "github:1321928757/dsh-openspec-workbench#v0.2.0"
 ```
 
 不带 tag 的 GitHub 命令会跟随默认分支，后续可能安装到更新内容。
@@ -100,7 +107,7 @@ dsh plugin --profile web add "github:1321928757/dsh-openspec-workbench#v0.1.0"
 - 只能选择已经注册到 DSH 的 Workspace，不能把任意目录直接交给工作台。
 - CLI 权威状态仅支持 OpenSpec CLI `1.12.x` 版本线。其他版本可能仍提供带 warning 的有边界 fallback 发现结果。
 - 当前版本为只读版本，不在 UI 中执行 OpenSpec 工作流命令。
-- 当前仓库通过 GitHub 分发，尚未发布 npm 版本；需要固定版本时请使用 `#v0.1.0` tag。
+- 当前仓库通过 GitHub 分发，尚未发布 npm 版本。已在正式 DSH `0.2.0` 上通过基本手动冒烟测试。仓库内记录的隔离运行时冒烟使用 RC.2；README 未附完整六个 RPC/不修改项目文件的验证轨迹。
 - profile 安装或更新后，必须重启正在运行的 DSH Web 进程，新的 Client 和 Host bundle 才会生效。
 
 ## 故障排查
